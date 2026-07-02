@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>Espace Admin — Bahri Hammami</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body style="animation:none; opacity:1;">
+
+<header class="site">
+  <div class="nav" style="justify-content:space-between;">
+    <div class="brand">✦ Admin</div>
+    <a href="index.html" style="font-size:12px; color:var(--ink-dim); letter-spacing:.06em; text-transform:uppercase;">← Voir le site</a>
+  </div>
+</header>
+
+<main class="wrap" style="padding:50px 0 80px; max-width:900px;">
+
+  <!-- ---------- Connexion ---------- -->
+  <section id="login-view">
+    <h2 class="section-title" style="font-size:32px;">Connexion</h2>
+    <p style="color:var(--ink-mid); font-size:13px; margin-bottom:22px;">
+      Cette page n'est pas listée sur le site public. Entre le mot de passe admin pour gérer les projets.
+    </p>
+    <form id="login-form" class="admin-card" style="max-width:380px;">
+      <label class="admin-label" for="login-password">Mot de passe</label>
+      <input type="password" id="login-password" class="admin-input" autocomplete="current-password" required>
+      <button type="submit" class="btn" style="margin-top:16px; width:100%; justify-content:center;">Se connecter</button>
+      <div id="login-error" class="admin-error"></div>
+    </form>
+  </section>
+
+  <!-- ---------- Tableau de bord ---------- -->
+  <section id="dashboard-view" hidden>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; flex-wrap:wrap; gap:12px;">
+      <h2 class="section-title" style="font-size:32px; margin-bottom:0;">Mes projets</h2>
+      <button id="logout-btn" class="btn ghost">Déconnexion</button>
+    </div>
+
+    <!-- Ajouter un projet -->
+    <form id="add-form" class="admin-card" style="margin-bottom:36px;">
+      <h3 style="font-size:16px; margin-bottom:16px;">Ajouter un projet</h3>
+
+      <label class="admin-label" for="add-title">Titre</label>
+      <input type="text" id="add-title" name="title" class="admin-input" placeholder="Ex. Match filmé — Foot24" required>
+
+      <label class="admin-label" for="add-description" style="margin-top:14px;">Description (optionnel)</label>
+      <textarea id="add-description" name="description" class="admin-input" rows="2" placeholder="Ex. Montage complet, tournage + montage"></textarea>
+
+      <label class="admin-label" for="add-file" style="margin-top:14px;">Images ou vidéos (tu peux en choisir plusieurs)</label>
+      <input type="file" id="add-file" name="media" class="admin-input" accept="image/*,video/*" multiple required>
+
+      <label style="display:flex; align-items:center; gap:8px; margin-top:14px; font-size:12.5px; color:var(--ink-mid);">
+        <input type="checkbox" id="add-large" name="large">
+        Format large (occupe 2 colonnes dans la grille)
+      </label>
+
+      <button type="submit" id="add-submit" class="btn" style="margin-top:18px;">Publier</button>
+      <div id="add-status" class="admin-status"></div>
+    </form>
+
+    <!-- Liste des projets existants -->
+    <div id="admin-projects-list" class="admin-grid"></div>
+    <p id="empty-state" style="color:var(--ink-dim); font-size:12.5px; margin-top:20px; display:none;">
+      Aucun projet pour l'instant. Ajoute ta première image ou vidéo ci-dessus.
+    </p>
+  </section>
+
+</main>
+
+<script src="admin.js"></script>
+</body>
+</html>

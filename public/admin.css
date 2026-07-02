@@ -1,0 +1,97 @@
+.admin-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:24px;
+}
+
+.admin-label{
+  display:block;
+  font-size:11px;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--ink-dim);
+  margin-bottom:6px;
+}
+
+.admin-input{
+  width:100%;
+  background:#0a1119;
+  border:1px solid var(--line);
+  border-radius:8px;
+  padding:10px 12px;
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  font-size:13.5px;
+  outline:none;
+  transition:border-color .2s;
+}
+.admin-input:focus{border-color:var(--red-1);}
+textarea.admin-input{resize:vertical;}
+
+.admin-error{
+  color:var(--red-1);
+  font-size:12.5px;
+  margin-top:12px;
+  min-height:1em;
+}
+.admin-status{
+  font-size:12.5px;
+  margin-top:12px;
+  min-height:1em;
+  color:var(--ink-mid);
+}
+.admin-status.ok{color:#2ea86b;}
+.admin-status.err{color:var(--red-1);}
+
+.admin-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
+  gap:16px;
+}
+
+.admin-project-card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:10px;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.admin-project-thumb{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  background:#0a1119;
+  display:block;
+}
+.admin-project-body{
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.admin-project-actions{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-top:4px;
+}
+
+.btn-sm{
+  padding:7px 12px;
+  border-radius:999px;
+  border:1px solid var(--line);
+  background:transparent;
+  color:var(--ink-mid);
+  font-size:11px;
+  letter-spacing:.05em;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition:background .2s, color .2s, border-color .2s;
+}
+.btn-sm:hover{border-color:var(--red-1); color:var(--ink);}
+.btn-sm.danger:hover{background:var(--red-1); border-color:var(--red-1); color:#fff;}
+
+button.btn, button.btn.ghost{cursor:pointer; border:1px solid var(--red-1); background:transparent; font-family:inherit;}
+button.btn.ghost{border-color:var(--line);}

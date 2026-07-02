@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Projets — Hammami Bahri</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site">
+      <div class="nav">
+        <div class="brand">✦</div>
+        <div class="tabs">
+          <a href="about.html">Profil</a>
+          <a href="projects.html" class="active">Projets</a>
+          <a href="contact.html">Contact</a>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap" style="padding: 50px 0 80px">
+      <div
+        style="
+          display: flex;
+          align-items: baseline;
+          gap: 16px;
+          margin-bottom: 34px;
+          flex-wrap: wrap;
+        "
+      >
+        <h2 class="section-title" style="margin-bottom: 0">
+          Recap project <span class="accent">Bahri</span>
+        </h2>
+        <span
+          style="
+            font-family: 'Space Mono', monospace;
+            font-size: 11px;
+            color: var(--ink-dim);
+            border: 1px solid var(--line);
+            padding: 4px 10px;
+            border-radius: 6px;
+          "
+          >à remplacer par tes miniatures</span
+        >
+      </div>
+
+      <div
+        id="projects-grid"
+        style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px"
+      >
+        <div class="placeholder reveal" style="aspect-ratio: 1/1">
+          <div class="ph-icon">🎬</div>
+          <div class="ph-label">Projet 01</div>
+        </div>
+        <div class="placeholder reveal" style="aspect-ratio: 1/1">
+          <div class="ph-icon">🎥</div>
+          <div class="ph-label">Projet 02</div>
+        </div>
+        <div class="placeholder reveal" style="aspect-ratio: 1/1">
+          <div class="ph-icon">🎙️</div>
+          <div class="ph-label">Projet 03</div>
+        </div>
+        <div class="placeholder reveal" style="aspect-ratio: 1/1">
+          <div class="ph-icon">📸</div>
+          <div class="ph-label">Projet 04</div>
+        </div>
+
+        <div
+          class="placeholder reveal"
+          style="aspect-ratio: 1/1; grid-column: span 2"
+        >
+          <div class="ph-icon">🎬</div>
+          <div class="ph-label">Projet 05 — format large</div>
+        </div>
+        <div
+          class="placeholder reveal"
+          style="aspect-ratio: 1/1; grid-column: span 2"
+        >
+          <div class="ph-icon">🎥</div>
+          <div class="ph-label">Projet 06 — format large</div>
+        </div>
+      </div>
+
+      <p
+        style="
+          color: var(--ink-dim);
+          font-size: 12.5px;
+          margin-top: 30px;
+          max-width: 600px;
+        "
+      >
+        Chaque case est un emplacement réservé. Remplace-la par une image ou une
+        vidéo, et ajoute le nom + une courte description du projet en dessous
+        (match filmé, montage Foot24, épisode radio…).
+      </p>
+    </main>
+
+    <footer class="site">
+      <div class="wrap">
+        <div>© Hammami Bahri</div>
+        <div class="socials"><a href="contact.html">Contact</a></div>
+      </div>
+    </footer>
+
+    <script src="interactions.js"></script>
+    <script src="project-grid.js"></script>
+  </body>
+</html>

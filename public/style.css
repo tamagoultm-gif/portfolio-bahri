@@ -1,0 +1,416 @@
+/* ========================================================
+   Portfolio — Bahri Hammami
+   Réplique fidèle de la maquette de référence :
+   fond quasi-noir + halo bleu, cercle bordeaux pour la photo,
+   typographie display condensée en majuscules, tabs pilule
+   centrées en haut (PROFIL / PROJECT / CONTACT PERSON).
+   ======================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&family=Space+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#04070c;
+  --panel:#0c131d;
+  --line:#1c2733;
+  --glow:#0d3a63;
+  --red-1:#b21e2b;
+  --red-2:#5c0f18;
+  --ink:#eef1f5;
+  --ink-dim:#7f8b99;
+  --ink-mid:#aab4c0;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+
+body{
+  min-height:100vh;
+  color:var(--ink);
+  font-family:'Inter',sans-serif;
+  background:var(--bg);
+  position:relative;
+  overflow-x:hidden;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle 640px at 88% 96%, rgba(13,58,99,0.55), transparent 60%),
+    radial-gradient(circle 480px at 6% 90%, rgba(13,58,99,0.30), transparent 60%);
+  pointer-events:none;
+  z-index:0;
+}
+
+a{color:inherit;text-decoration:none;}
+
+.wrap{
+  position:relative;
+  z-index:1;
+  max-width:1180px;
+  margin:0 auto;
+  padding:0 50px;
+}
+
+/* ---------- Header : logo + tabs centrées ---------- */
+header.site{
+  position:relative;
+  z-index:5;
+  padding:26px 0 0;
+}
+.nav{
+  position:relative;
+  display:flex;
+  align-items:center;
+  max-width:1180px;
+  margin:0 auto;
+  padding:0 50px;
+  min-height:34px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  font-family:'Anton',sans-serif;
+  font-size:20px;
+  letter-spacing:0.02em;
+  color:var(--ink);
+}
+
+.tabs{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  display:flex;
+  gap:6px;
+}
+.tabs a{
+  padding:8px 20px;
+  border-radius:999px;
+  font-size:11px;
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--ink-dim);
+  transition:background .2s, color .2s;
+}
+.tabs a:hover{color:var(--ink);}
+.tabs a.active{
+  background:#dce6f0;
+  color:#0a1420;
+}
+
+@media (max-width:760px){
+  .nav{flex-direction:column; gap:16px; padding:0 20px; align-items:flex-start;}
+  .tabs{position:static; transform:none; flex-wrap:wrap;}
+  .wrap{padding:0 20px;}
+}
+
+/* ---------- Type system ---------- */
+h1,h2,h3,.display{
+  font-family:'Anton',sans-serif;
+  font-weight:400;
+  text-transform:uppercase;
+  letter-spacing:0.01em;
+  line-height:0.98;
+}
+
+.eyebrow{
+  display:inline-flex;
+  align-items:center;
+  gap:9px;
+  font-family:'Space Mono',monospace;
+  font-size:11px;
+  letter-spacing:0.16em;
+  text-transform:uppercase;
+  color:var(--ink-mid);
+  margin-bottom:14px;
+}
+.eyebrow::before{
+  content:"";
+  width:7px;height:7px;
+  background:var(--red-1);
+}
+
+.section-title{
+  font-size:clamp(32px,4.6vw,54px);
+  margin-bottom:8px;
+}
+.section-title .accent{color:var(--red-1);}
+
+.tag-inline{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  font-size:12px;
+  letter-spacing:.06em;
+  color:var(--ink-mid);
+}
+.tag-inline .sq{width:8px;height:8px;background:var(--ink-mid);display:inline-block;}
+
+/* ---------- Cercle photo bordeaux (élément signature) ---------- */
+.photo-half{
+  position:relative;
+  width:100%;
+  aspect-ratio:1/1;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 35%, var(--red-1), var(--red-2) 75%);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.photo-half .ph-inner{
+  color:rgba(255,255,255,0.7);
+  font-family:'Space Mono',monospace;
+  font-size:10.5px;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+}
+.photo-half img{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  display:none;
+}
+.photo-half.filled .ph-inner{display:none;}
+.photo-half.filled img{display:block;}
+
+.photo-circle{
+  position:relative;
+  border-radius:50%;
+  background:linear-gradient(160deg, #1a2733, #0a1219);
+  border:2px solid var(--line);
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 0 0 8px rgba(13,58,99,0.18);
+}
+.photo-circle .ph-inner{
+  color:var(--ink-dim);
+  font-family:'Space Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  text-align:center;
+}
+.photo-circle img{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  display:none;
+}
+.photo-circle.filled .ph-inner{display:none;}
+.photo-circle.filled img{display:block;}
+
+/* ---------- Menu style "jeu vidéo" (START / OPTIONS / EXIT) ---------- */
+.menu-list{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+  margin-top:30px;
+}
+.menu-list a{
+  font-family:'Anton',sans-serif;
+  font-size:14px;
+  letter-spacing:0.14em;
+  color:var(--ink-mid);
+  transition:color .2s, letter-spacing .2s;
+}
+.menu-list a:hover{color:var(--ink); letter-spacing:0.18em;}
+
+/* ---------- Cards / panels ---------- */
+.card{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:10px;
+  padding:22px;
+}
+
+.chip{
+  width:44px;height:44px;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+  font-weight:700;
+}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:13px 26px;
+  border-radius:999px;
+  border:1px solid var(--red-1);
+  color:var(--ink);
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  transition:background .2s;
+}
+.btn:hover{background:var(--red-1);}
+.btn.ghost{border-color:var(--line); color:var(--ink-mid);}
+.btn.ghost:hover{background:rgba(255,255,255,0.05); color:var(--ink);}
+
+/* ---------- Placeholder blocks (projets) ---------- */
+.placeholder{
+  position:relative;
+  border-radius:6px;
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,0.02) 0 2px, transparent 2px 12px),
+    var(--panel);
+  border:1px dashed var(--line);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  color:var(--ink-dim);
+  text-align:center;
+  overflow:hidden;
+}
+.placeholder .ph-icon{font-size:18px;opacity:.55;}
+.placeholder .ph-label{
+  font-family:'Space Mono',monospace;
+  font-size:9px;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+}
+.placeholder img,
+.placeholder video{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:cover;
+  display:none;
+}
+.placeholder.filled .ph-icon,
+.placeholder.filled .ph-label{display:none;}
+.placeholder.filled img,
+.placeholder.filled video{display:block;}
+
+/* ---------- Footer ---------- */
+footer.site{
+  position:relative;
+  z-index:1;
+  border-top:1px solid var(--line);
+  padding:26px 0 46px;
+  color:var(--ink-dim);
+  font-size:11.5px;
+  margin-top:36px;
+}
+footer.site .wrap{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+}
+footer.site .socials{display:flex;gap:18px;}
+footer.site .socials a{color:var(--ink-dim); transition:color .2s;}
+footer.site .socials a:hover{color:var(--red-1);}
+
+/* ---------- Utility ---------- */
+body{animation:pageFade .9s ease both;}
+@keyframes pageFade{
+  from{opacity:0;}
+  to{opacity:1;}
+}
+
+/* Scroll-triggered reveal (replaces old load-only animation) */
+.reveal{
+  opacity:0;
+  transform:translateY(28px) rotateX(8deg);
+  transform-origin:center bottom;
+  transition:opacity .8s cubic-bezier(.16,.8,.24,1), transform .8s cubic-bezier(.16,.8,.24,1);
+}
+.reveal.in-view{
+  opacity:1;
+  transform:translateY(0) rotateX(0);
+}
+
+/* ================= 3D & motion layer ================= */
+
+/* Cursor-follow ambient glow */
+.spotlight{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:2;
+  mix-blend-mode:screen;
+  opacity:0;
+  transition:opacity .4s ease;
+  background:radial-gradient(560px circle at var(--mx,50%) var(--my,50%),
+    rgba(178,30,43,0.12), rgba(13,58,99,0.10) 38%, transparent 65%);
+}
+.spotlight.active{opacity:1;}
+
+/* Tiltable elements (JS applies perspective/rotate on mousemove) */
+.tilt{
+  transition:transform .35s cubic-bezier(.16,.9,.3,1), box-shadow .35s ease, border-color .35s ease;
+  will-change:transform;
+}
+.tilt:hover,
+.tilt.tilting{
+  box-shadow:0 24px 48px -16px rgba(0,0,0,0.65), 0 0 0 1px rgba(178,30,43,0.28);
+}
+
+/* Slow ambient float for the signature hero photo */
+.float-slow{animation:floatY 6s ease-in-out infinite;}
+@keyframes floatY{
+  0%,100%{transform:translateY(0);}
+  50%{transform:translateY(-10px);}
+}
+
+/* Skill chips: playful 3D pop */
+.chip{transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s ease;}
+.chip:hover{
+  transform:translateY(-5px) rotateX(14deg) rotateY(-10deg) scale(1.08);
+  box-shadow:0 16px 22px -8px rgba(0,0,0,.65);
+}
+
+/* Project placeholders: reveal + depth on hover */
+.placeholder{
+  opacity:0;
+  transform:translateY(22px) scale(.96);
+  transition:opacity .7s ease, transform .55s cubic-bezier(.2,.8,.2,1), border-color .3s ease, box-shadow .35s ease;
+}
+.placeholder.in-view{opacity:1; transform:translateY(0) scale(1);}
+.placeholder:hover{border-color:var(--red-1);}
+
+/* Menu list micro-interaction */
+.menu-list a{display:inline-block; transition:transform .3s ease, color .2s, letter-spacing .2s;}
+.menu-list a:hover{transform:translateX(8px);}
+
+/* Sliding pill behind active nav tab */
+.tabs{overflow:visible;}
+.tab-pill{
+  position:absolute;
+  top:0; left:0;
+  height:100%;
+  border-radius:999px;
+  background:#dce6f0;
+  z-index:0;
+  transition:transform .5s cubic-bezier(.16,.8,.24,1), width .5s cubic-bezier(.16,.8,.24,1);
+}
+.tabs a{position:relative; z-index:1;}
+.tabs a.active{background:transparent; color:#0a1420;}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce){
+  body{animation:none;}
+  .reveal, .placeholder{transition:none; opacity:1; transform:none;}
+  .tilt{transition:none;}
+  .float-slow{animation:none;}
+  .spotlight{display:none;}
+  .chip{transition:none;}
+}

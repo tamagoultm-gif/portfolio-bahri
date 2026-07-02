@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bahri Hammami — Portfolio</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="site">
+      <div class="nav" style="justify-content: flex-start">
+        <div class="brand">✦</div>
+      </div>
+    </header>
+
+    <main>
+      <section
+        class="wrap"
+        style="min-height: 82vh; display: flex; align-items: center"
+      >
+        <div
+          style="
+            display: grid;
+            grid-template-columns: 0.9fr 1.6fr;
+            gap: 0;
+            align-items: center;
+            width: 100%;
+          "
+        >
+          <!-- half-circle photo, bleeding off the left edge like the reference -->
+          <div
+            class="float-slow"
+            style="position: relative; margin-left: -50px"
+          >
+            <div class="photo-half reveal filled" style="max-width: 280px">
+              <div class="ph-inner">
+                <span style="font-size: 20px">📷</span>
+                Photo à ajouter
+              </div>
+              <img src="uploads/bahri-profile.jpg" alt="Bahri Hammami" />
+            </div>
+          </div>
+
+          <div class="reveal" style="animation-delay: 0.1s; padding-left: 20px">
+            <h1
+              style="
+                font-size: clamp(46px, 7.5vw, 96px);
+                display: flex;
+                align-items: baseline;
+                gap: 22px;
+                flex-wrap: wrap;
+              "
+            >
+              Hammami
+              <span
+                style="
+                  font-size: 0.4em;
+                  color: var(--ink-dim);
+                  -webkit-text-stroke: 0;
+                "
+              ></span>
+            </h1>
+            <h1
+              style="
+                font-size: clamp(46px, 7.5vw, 96px);
+                color: var(--ink-mid);
+                margin-top: -6px;
+              "
+            >
+              Bahri
+            </h1>
+
+            <div class="tag-inline" style="margin-top: 26px">
+              <span class="sq"></span> Cadreur — Monteur — Créateur de contenu —
+              Marketing — Disigner
+            </div>
+
+            <div class="menu-list">
+              <a href="about.html">Profil</a>
+              <a href="projects.html">Projets</a>
+              <a href="contact.html">Contact</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site">
+      <div class="wrap">
+        <div>© Hammami Bahri</div>
+        <div class="socials"><a href="contact.html">Contact</a></div>
+      </div>
+    </footer>
+
+    <script src="interactions.js"></script>
+  </body>
+</html>
