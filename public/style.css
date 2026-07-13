@@ -108,7 +108,7 @@ header.site{
 
   /* homepage hero */
   .hero-grid{grid-template-columns:1fr !important; gap:28px !important; text-align:center;}
-  .hero-grid > div:first-child{margin-left:0 !important; justify-self:center;}
+  .hero-grid > div:first-child{margin:0 auto !important; width:220px; max-width:220px;}
   .hero-grid h1{justify-content:center !important;}
   .hero-grid .tag-inline{justify-content:center;}
 
