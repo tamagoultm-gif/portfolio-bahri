@@ -105,7 +105,33 @@ header.site{
   .nav{flex-direction:column; gap:16px; padding:0 20px; align-items:flex-start;}
   .tabs{position:static; transform:none; flex-wrap:wrap;}
   .wrap{padding:0 20px;}
+
+  /* homepage hero */
+  .hero-grid{grid-template-columns:1fr !important; gap:28px !important; text-align:center;}
+  .hero-grid > div:first-child{margin-left:0 !important; justify-self:center;}
+  .hero-grid h1{justify-content:center !important;}
+  .hero-grid .tag-inline{justify-content:center;}
+
+  /* profil page */
+  .about-grid{grid-template-columns:1fr !important; gap:26px !important;}
+  .about-grid > div:first-child{max-width:220px; margin:0 auto;}
+  .about-columns{grid-template-columns:1fr !important; gap:26px !important;}
+
+  /* contact page */
+  .contact-grid{grid-template-columns:1fr !important; gap:32px !important; min-height:auto !important; text-align:center;}
+  .contact-grid h1{text-align:center;}
+  .contact-info-row{flex-direction:column; align-items:center !important; text-align:left;}
+  .contact-social-grid{grid-template-columns:1fr !important;}
+
+  /* projects grid */
+  #projects-grid{grid-template-columns:repeat(2,1fr) !important; gap:10px !important;}
 }
+
+@media (max-width:480px){
+  #projects-grid{grid-template-columns:1fr !important;}
+  .photo-half{max-width:220px !important;}
+}
+
 
 /* ---------- Type system ---------- */
 h1,h2,h3,.display{
