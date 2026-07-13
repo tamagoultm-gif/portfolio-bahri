@@ -127,6 +127,8 @@ header.site{
 
   /* projects grid */
   #projects-grid{grid-template-columns:repeat(2,1fr) !important; gap:10px !important;}
+  #projects-grid > a{grid-column:span 1 !important; aspect-ratio:1/1 !important; max-width:100% !important; overflow:hidden !important;}
+  #projects-grid img, #projects-grid video{max-width:100% !important; max-height:100% !important;}
 
   /* sécurité : sur mobile, ne jamais laisser un élément invisible si l'animation ne se déclenche pas */
   .reveal{opacity:1 !important; transform:none !important;}
