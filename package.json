@@ -8,7 +8,9 @@
     "hash-password": "node hash-password.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.45.4",
     "bcryptjs": "^2.4.3",
+    "cloudinary": "^2.5.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "express-session": "^1.18.0",

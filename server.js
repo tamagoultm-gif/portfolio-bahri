@@ -4,29 +4,53 @@ const session = require('express-session');
 const multer = require('multer');
 const bcrypt = require('bcryptjs');
 const path = require('path');
-const fs = require('fs');
 const crypto = require('crypto');
+const cloudinary = require('cloudinary').v2;
+const { createClient } = require('@supabase/supabase-js');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const DATA_FILE = path.join(__dirname, 'data', 'projects.json');
-const UPLOAD_DIR = path.join(__dirname, 'public', 'uploads');
 
-// ---------- Ensure storage exists ----------
-fs.mkdirSync(path.dirname(DATA_FILE), { recursive: true });
-fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, '[]');
+// ---------- Cloudinary (stockage des images/vidéos) ----------
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-// ---------- Tiny JSON "database" (fine for a single-admin portfolio) ----------
-let writeQueue = Promise.resolve();
-function readProjects() {
-  return JSON.parse(fs.readFileSync(DATA_FILE, 'utf-8'));
+// ---------- Supabase (stockage des infos des projets) ----------
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SECRET_KEY);
+
+async function readProjects() {
+  const { data, error } = await supabase
+    .from('projects')
+    .select('data')
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return (data || []).map((row) => row.data);
 }
-function writeProjects(data) {
-  writeQueue = writeQueue.then(() =>
-    fs.promises.writeFile(DATA_FILE, JSON.stringify(data, null, 2))
-  );
-  return writeQueue;
+
+async function writeProjects(projects) {
+  // remplace entièrement la table par la liste fournie (simple et fiable pour ce petit volume)
+  const { error: delErr } = await supabase.from('projects').delete().neq('id', '');
+  if (delErr) throw delErr;
+  if (projects.length) {
+    const rows = projects.map((p) => ({ id: p.id, data: p, created_at: p.createdAt || new Date().toISOString() }));
+    const { error: insErr } = await supabase.from('projects').insert(rows);
+    if (insErr) throw insErr;
+  }
+}
+
+async function upsertProject(project) {
+  const { error } = await supabase
+    .from('projects')
+    .upsert({ id: project.id, data: project, created_at: project.createdAt || new Date().toISOString() });
+  if (error) throw error;
+}
+
+async function deleteProjectRow(id) {
+  const { error } = await supabase.from('projects').delete().eq('id', id);
+  if (error) throw error;
 }
 
 // ---------- Core middleware ----------
@@ -103,21 +127,18 @@ app.get('/api/admin/check', (req, res) => {
 });
 
 // ============ Public read ============
-app.get('/api/projects', (req, res) => {
-  res.json(readProjects());
+app.get('/api/projects', async (req, res) => {
+  try {
+    res.json(await readProjects());
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
-// ============ Upload config ============
+// ============ Upload config (en mémoire, puis envoyé vers Cloudinary) ============
 const ALLOWED_EXT = ['.jpg', '.jpeg', '.png', '.webp', '.gif', '.mp4', '.webm', '.mov'];
-const storage = multer.diskStorage({
-  destination: UPLOAD_DIR,
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
-    cb(null, crypto.randomUUID() + ext);
-  },
-});
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: { fileSize: 80 * 1024 * 1024 }, // 80MB, generous enough for short video clips
   fileFilter: (req, file, cb) => {
     const ext = path.extname(file.originalname).toLowerCase();
@@ -126,20 +147,47 @@ const upload = multer({
   },
 });
 
-function filesToMedia(files) {
-  return (files || []).map((f) => ({
-    id: crypto.randomUUID(),
-    type: f.mimetype.startsWith('video') ? 'video' : 'image',
-    url: '/uploads/' + f.filename,
-  }));
+function uploadBufferToCloudinary(file) {
+  return new Promise((resolve, reject) => {
+    const isVideo = file.mimetype.startsWith('video');
+    const stream = cloudinary.uploader.upload_stream(
+      { resource_type: isVideo ? 'video' : 'image', folder: 'portfolio-bahri' },
+      (err, result) => {
+        if (err) return reject(err);
+        resolve({
+          id: crypto.randomUUID(),
+          type: isVideo ? 'video' : 'image',
+          url: result.secure_url,
+          public_id: result.public_id,
+          resource_type: result.resource_type,
+        });
+      }
+    );
+    stream.end(file.buffer);
+  });
+}
+
+async function filesToMedia(files) {
+  return Promise.all((files || []).map(uploadBufferToCloudinary));
+}
+
+function deleteFromCloudinary(media) {
+  if (!media || !media.public_id) return Promise.resolve();
+  return cloudinary.uploader
+    .destroy(media.public_id, { resource_type: media.resource_type || 'image' })
+    .catch(() => {});
 }
 
 // ============ Public read: single project ============
-app.get('/api/projects/:id', (req, res) => {
-  const projects = readProjects();
-  const project = projects.find((p) => p.id === req.params.id);
-  if (!project) return res.status(404).json({ error: 'Introuvable.' });
-  res.json(project);
+app.get('/api/projects/:id', async (req, res) => {
+  try {
+    const projects = await readProjects();
+    const project = projects.find((p) => p.id === req.params.id);
+    if (!project) return res.status(404).json({ error: 'Introuvable.' });
+    res.json(project);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // ============ Admin: CRUD projects ============
@@ -148,8 +196,7 @@ app.post('/api/admin/projects', requireAuth, upload.array('media', 20), async (r
     if (!req.files || !req.files.length) return res.status(400).json({ error: 'Au moins un fichier requis.' });
     const { title, description, large } = req.body || {};
 
-    const media = filesToMedia(req.files);
-    const projects = readProjects();
+    const media = await filesToMedia(req.files);
     const project = {
       id: crypto.randomUUID(),
       title: (title || 'Sans titre').trim(),
@@ -161,8 +208,7 @@ app.post('/api/admin/projects', requireAuth, upload.array('media', 20), async (r
       large: large === 'true' || large === true,
       createdAt: new Date().toISOString(),
     };
-    projects.push(project);
-    await writeProjects(projects);
+    await upsertProject(project);
     res.json(project);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -173,11 +219,11 @@ app.post('/api/admin/projects', requireAuth, upload.array('media', 20), async (r
 app.post('/api/admin/projects/:id/media', requireAuth, upload.array('media', 20), async (req, res) => {
   try {
     if (!req.files || !req.files.length) return res.status(400).json({ error: 'Au moins un fichier requis.' });
-    const projects = readProjects();
+    const projects = await readProjects();
     const idx = projects.findIndex((p) => p.id === req.params.id);
     if (idx === -1) return res.status(404).json({ error: 'Introuvable.' });
 
-    const newMedia = filesToMedia(req.files);
+    const newMedia = await filesToMedia(req.files);
     if (!Array.isArray(projects[idx].media)) {
       projects[idx].media = projects[idx].url ? [{ id: crypto.randomUUID(), type: projects[idx].type, url: projects[idx].url }] : [];
     }
@@ -185,7 +231,7 @@ app.post('/api/admin/projects/:id/media', requireAuth, upload.array('media', 20)
     projects[idx].type = projects[idx].media[0].type;
     projects[idx].url = projects[idx].media[0].url;
 
-    await writeProjects(projects);
+    await upsertProject(projects[idx]);
     res.json(projects[idx]);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -194,76 +240,87 @@ app.post('/api/admin/projects/:id/media', requireAuth, upload.array('media', 20)
 
 // Remove a single photo/video from a project
 app.delete('/api/admin/projects/:id/media/:mediaId', requireAuth, async (req, res) => {
-  const projects = readProjects();
-  const idx = projects.findIndex((p) => p.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'Introuvable.' });
+  try {
+    const projects = await readProjects();
+    const idx = projects.findIndex((p) => p.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Introuvable.' });
 
-  const project = projects[idx];
-  if (!Array.isArray(project.media)) return res.status(404).json({ error: 'Média introuvable.' });
+    const project = projects[idx];
+    if (!Array.isArray(project.media)) return res.status(404).json({ error: 'Média introuvable.' });
 
-  const mIdx = project.media.findIndex((m) => m.id === req.params.mediaId);
-  if (mIdx === -1) return res.status(404).json({ error: 'Média introuvable.' });
-  if (project.media.length === 1) {
-    return res.status(400).json({ error: 'Un projet doit garder au moins un média. Supprime le projet entier si besoin.' });
+    const mIdx = project.media.findIndex((m) => m.id === req.params.mediaId);
+    if (mIdx === -1) return res.status(404).json({ error: 'Média introuvable.' });
+    if (project.media.length === 1) {
+      return res.status(400).json({ error: 'Un projet doit garder au moins un média. Supprime le projet entier si besoin.' });
+    }
+
+    const [removed] = project.media.splice(mIdx, 1);
+    project.type = project.media[0].type;
+    project.url = project.media[0].url;
+
+    await upsertProject(project);
+    await deleteFromCloudinary(removed);
+
+    res.json(project);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
-
-  const [removed] = project.media.splice(mIdx, 1);
-  project.type = project.media[0].type;
-  project.url = project.media[0].url;
-
-  await writeProjects(projects);
-
-  const filePath = path.join(__dirname, 'public', removed.url);
-  fs.unlink(filePath, () => {});
-
-  res.json(project);
 });
 
 app.put('/api/admin/projects/:id', requireAuth, async (req, res) => {
-  const { title, description, large } = req.body || {};
-  const projects = readProjects();
-  const idx = projects.findIndex((p) => p.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'Introuvable.' });
+  try {
+    const { title, description, large } = req.body || {};
+    const projects = await readProjects();
+    const idx = projects.findIndex((p) => p.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Introuvable.' });
 
-  if (title !== undefined) projects[idx].title = String(title).trim();
-  if (description !== undefined) projects[idx].description = String(description).trim();
-  if (large !== undefined) projects[idx].large = !!large;
+    if (title !== undefined) projects[idx].title = String(title).trim();
+    if (description !== undefined) projects[idx].description = String(description).trim();
+    if (large !== undefined) projects[idx].large = !!large;
 
-  await writeProjects(projects);
-  res.json(projects[idx]);
+    await upsertProject(projects[idx]);
+    res.json(projects[idx]);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.delete('/api/admin/projects/:id', requireAuth, async (req, res) => {
-  const projects = readProjects();
-  const idx = projects.findIndex((p) => p.id === req.params.id);
-  if (idx === -1) return res.status(404).json({ error: 'Introuvable.' });
+  try {
+    const projects = await readProjects();
+    const idx = projects.findIndex((p) => p.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Introuvable.' });
 
-  const [removed] = projects.splice(idx, 1);
-  await writeProjects(projects);
+    const [removed] = projects.splice(idx, 1);
+    await deleteProjectRow(removed.id);
 
-  // best-effort cleanup of all uploaded files for this project
-  const mediaList = Array.isArray(removed.media) ? removed.media : (removed.url ? [{ url: removed.url }] : []);
-  mediaList.forEach((m) => {
-    const filePath = path.join(__dirname, 'public', m.url);
-    fs.unlink(filePath, () => {});
-  });
+    // best-effort cleanup of all uploaded media on Cloudinary
+    const mediaList = Array.isArray(removed.media) ? removed.media : [];
+    await Promise.all(mediaList.map(deleteFromCloudinary));
 
-  res.json({ ok: true });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 app.put('/api/admin/projects-reorder', requireAuth, async (req, res) => {
-  const { order } = req.body || {};
-  if (!Array.isArray(order)) return res.status(400).json({ error: 'order invalide.' });
+  try {
+    const { order } = req.body || {};
+    if (!Array.isArray(order)) return res.status(400).json({ error: 'order invalide.' });
 
-  const projects = readProjects();
-  const byId = new Map(projects.map((p) => [p.id, p]));
-  const reordered = order.map((id) => byId.get(id)).filter(Boolean);
-  projects.forEach((p) => {
-    if (!order.includes(p.id)) reordered.push(p);
-  });
+    const projects = await readProjects();
+    const byId = new Map(projects.map((p) => [p.id, p]));
+    const reordered = order.map((id) => byId.get(id)).filter(Boolean);
+    projects.forEach((p) => {
+      if (!order.includes(p.id)) reordered.push(p);
+    });
 
-  await writeProjects(reordered);
-  res.json({ ok: true });
+    await writeProjects(reordered);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
 });
 
 // multer / general error handler

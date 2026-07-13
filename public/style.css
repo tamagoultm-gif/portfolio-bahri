@@ -125,6 +125,9 @@ header.site{
 
   /* projects grid */
   #projects-grid{grid-template-columns:repeat(2,1fr) !important; gap:10px !important;}
+
+  /* sécurité : sur mobile, ne jamais laisser un élément invisible si l'animation ne se déclenche pas */
+  .reveal{opacity:1 !important; transform:none !important;}
 }
 
 @media (max-width:480px){
