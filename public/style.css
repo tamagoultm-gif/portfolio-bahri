@@ -104,7 +104,9 @@ header.site{
 @media (max-width:760px){
   .nav{flex-direction:column; gap:16px; padding:0 20px; align-items:flex-start;}
   .tabs{position:static; transform:none; flex-wrap:wrap;}
-  .wrap{padding:0 20px;}
+  .tab-pill{display:none;}
+  .tabs a.active{background:#dce6f0; color:#0a1420;}
+  .wrap{padding-left:20px !important; padding-right:20px !important;}
 
   /* homepage hero */
   .hero-grid{grid-template-columns:1fr !important; gap:28px !important; text-align:center;}
